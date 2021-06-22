@@ -3,13 +3,18 @@ import json
 from pathlib import Path
 
 
-def get_client():
-    creds = Path(Path(__file__).parent.absolute(), "auth.json")
-    with open(creds) as f:
-        auth = json.load(f)
-    return praw.Reddit(**auth)
+class SaveReddit:
+    def __init__(self) -> None:
+        self._client = self.get_client()
+        self._saved = None
 
+    def get_client(self):
+        creds = Path(Path(__file__).parent.absolute(), "auth.json")
+        with open(creds) as f:
+            auth = json.load(f)
+        return praw.Reddit(**auth)
 
-if __name__ == "__main__":
-    client = get_client()
-    print(client.user.me())
+    def get_saved(self):
+        if self._saved is None:
+            self._saved = [s for s in self._client.user.me().saved()]
+        return self._saved
